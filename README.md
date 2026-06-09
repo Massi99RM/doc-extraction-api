@@ -1,0 +1,77 @@
+# Doc Extraction API
+
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-Serving-green.svg)
+![MongoDB](https://img.shields.io/badge/MongoDB-Storage-brightgreen.svg)
+![Elasticsearch](https://img.shields.io/badge/Elasticsearch-Search-orange.svg)
+![Azure](https://img.shields.io/badge/Azure-Document_Intelligence-blue.svg)
+![Claude](https://img.shields.io/badge/Anthropic-Claude_API-purple.svg)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
+An end-to-end document intelligence pipeline that extracts structured data from invoice PDFs using Azure Document Intelligence and Claude API, stores results in MongoDB, and exposes full-text search through Elasticsearch — all served via FastAPI and orchestrated with Docker Compose.
+
+## Overview
+
+Most document processing stops at OCR. This pipeline goes further. The goal is to show that a raw PDF can be ingested, understood, stored, and queried through a production-grade API — combining classical document parsing with LLM-powered extraction.
+
+Invoices are used as the demo case, but the architecture generalizes to any semi-structured document type: contracts, receipts, forms.
+
+## How It Works
+
+### Pipeline Steps
+
+Each invoice upload triggers the following steps in order:
+
+1. **Ingest** — FastAPI receives the PDF via a POST endpoint
+2. **OCR** — Azure Document Intelligence parses the file, returning structured text and layout information
+3. **Extraction** — Claude API interprets the parsed output and returns clean structured JSON: vendor, amount, date, line items
+4. **Storage** — the raw OCR output and extracted JSON are persisted in MongoDB
+5. **Indexing** — extracted fields are pushed to Elasticsearch for full-text and filtered search
+6. **Query** — FastAPI exposes search and retrieval endpoints over the indexed data
+
+### Why Two Databases?
+
+MongoDB is the source of truth — flexible schema, stores the full document as-is. Elasticsearch is the search engine — optimized for querying by vendor, date range, amount, or free text. They serve different purposes and complement each other.
+
+## Project Structure
+
+doc-extraction-api/
+│
+├── app/
+│   ├── main.py                  # FastAPI app entry point
+│   ├── config.py                # Loads environment variables
+│   │
+│   ├── api/
+│   │   └── routes/
+│   │       ├── ingest.py        # POST /invoices/upload
+│   │       └── search.py        # GET /invoices/search, GET /invoices/{id}
+│   │
+│   ├── services/
+│   │   ├── ocr.py               # Azure Document Intelligence calls
+│   │   ├── extraction.py        # Claude API calls
+│   │   ├── storage.py           # MongoDB logic
+│   │   └── indexing.py          # Elasticsearch logic
+│   │
+│   ├── models/
+│   │   └── invoice.py           # Pydantic models — data shapes and validation
+│   │
+│   └── db/
+│       ├── mongo.py             # MongoDB connection
+│       └── elastic.py           # Elasticsearch connection
+│
+├── tests/
+├── .gitignore
+├── docker-compose.yml
+├── requirements.txt
+├── .env.example
+└── README.md
+
+## Running the Project
+
+*Setup instructions will be added as the project stabilizes.*
+
+## License
+
+MIT
+
