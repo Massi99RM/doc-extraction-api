@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  mongo:
+    # image, ports, environment variables
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - 27017:27017
+
+  elasticsearch:
+    # image, ports, environment variables
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    ports:
+      - 9200:9200
+    environment:
+      - "discovery.type=single-node"
+      # sets the JavaVM minimum and maximum heap memory: without limits, grabs as much RAM as it wants
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m" 
+      # for local development it's false
+      - "xpack.security.enabled=false" 
