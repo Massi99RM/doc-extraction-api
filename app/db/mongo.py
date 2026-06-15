@@ -5,12 +5,12 @@ client = None
 db = None
 
 async def connect():
-    # initialize client and db here
+    # initialize client and db 
     global client, db
     client = AsyncIOMotorClient(settings.mongo_uri)
     db = client["invoices"]
 
 async def disconnect():
-    # close the client here
+    # close the client 
     global client
     client.close()
