@@ -1,16 +1,22 @@
 from fastapi import FastAPI
 from app.db import mongo, elastic
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup: connect
+    try:
+        # connect to both databases
+        await mongo.connect()
+        await elastic.connect()
+        yield
+    # shutdown: disconnect
+    finally:
+        # disconnect from both databases
+        await mongo.disconnect()
+        await elastic.disconnect()
 
-@app.on_event("startup")
-async def startup():
-    # connect to both databases 
-    await mongo.connect()
-    await elastic.connect()
 
-@app.on_event("shutdown")
-async def shutdown():
-    # disconnect from both databases 
-    await mongo.disconnect()
-    await elastic.disconnect()
+app = FastAPI(lifespan=lifespan)
+
+
