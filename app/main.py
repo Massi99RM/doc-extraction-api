@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.api.routes import ingest, search
 from app.db import mongo, elastic
 from contextlib import asynccontextmanager
 
@@ -18,5 +19,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.include_router(search.router)
+app.include_router(ingest.router)
 
 
