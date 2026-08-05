@@ -1,0 +1,18 @@
+# FastAPI Framework & Server
+fastapi
+uvicorn
+pydantic-settings
+python-multipart
+
+# Database & Search Drivers
+motor
+elasticsearch[async]
+
+# Cloud & AI Services
+azure-core
+azure-ai-documentintelligence
+anthropic
+
+# Testing
+pytest
+pytest-asyncio
