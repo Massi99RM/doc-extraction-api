@@ -39,6 +39,6 @@ async def test_search_by_id_not_found(client):
         
         response = client.get("/invoices/nonexistent_id")
         
-        assert response.status_code == 200
-        assert response.json() is None
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Invoice not found"}
         mock.assert_awaited_once_with("nonexistent_id")
