@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.services import storage, indexing
 
 router = APIRouter()
@@ -13,4 +13,6 @@ async def search_by_text(query: str):
 async def search_by_id(id: str):
     # Fetch a single invoice from MongoDB by its id
     invoice = await storage.get_invoice(id)
+    if invoice is None:
+        raise HTTPException(status_code=404, detail="Invoice not found")
     return invoice
