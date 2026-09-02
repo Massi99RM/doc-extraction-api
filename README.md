@@ -36,6 +36,7 @@ MongoDB is the source of truth — flexible schema, stores the full document as-
 
 ## Project Structure
 
+```
 doc-extraction-api/
 │
 ├── app/
@@ -66,12 +67,91 @@ doc-extraction-api/
 ├── requirements.txt
 ├── .env.example
 └── README.md
+```
 
 ## Running the Project
 
-*Setup instructions will be added as the project stabilizes.*
+## Setup
+
+### 1. Get your API keys
+
+**Anthropic (Claude API)**
+- Sign up at [console.anthropic.com](https://console.anthropic.com)
+- Go to API Keys → Create Key
+- Copy the key — you'll need it for `claude_api_key` in your `.env`
+
+**Azure Document Intelligence**
+- Sign up at [portal.azure.com](https://portal.azure.com) (free tier available: 500 pages/month)
+- Create a resource → search "Document Intelligence" → select the **F0** free tier
+- Once created, go to **Keys and Endpoint**
+- Copy the endpoint URL and Key 1 — these are your `azure_url` and `azure_key`
+
+### 2. Configure environment variables
+
+Copy `.env.example` to `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Fill in your credentials:
+
+```env
+mongo_uri=mongodb://admin:admin@mongo:27017/invoices?authSource=admin
+elastic_src=http://elasticsearch:9200
+claude_api_key=your_claude_api_key
+azure_url=your_azure_endpoint
+azure_key=your_azure_key
+```
+
+> `mongo_uri` and `elastic_src` are pre-configured for Docker Compose. Do not change them unless running the services manually.
+
+### 3. Run with Docker Compose
+
+```bash
+docker-compose up --build
+```
+
+This starts three containers: the FastAPI app, MongoDB, and Elasticsearch.
+
+Once running, the API is available at `http://localhost:8000`.
+Interactive docs (Swagger UI) at `http://localhost:8000/docs`.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/invoices/upload` | Upload a PDF invoice for processing |
+| GET | `/invoices/search?q=` | Full-text search across indexed invoices |
+| GET | `/invoices/{id}` | Retrieve a specific invoice by ID |
+
+### Upload an invoice
+
+```bash
+curl -X POST http://localhost:8000/invoices/upload \
+  -F "file=@invoice.pdf"
+```
+
+### Search invoices
+
+```bash
+curl "http://localhost:8000/invoices/search?q=vendor_name"
+```
+
+### Retrieve by ID
+
+```bash
+curl http://localhost:8000/invoices/{invoice_id}
+```
+
+## Running Tests
+
+```bash
+pytest tests/
+```
+
+All external dependencies (Azure, Claude, MongoDB, Elasticsearch) are mocked. 10/10 unit tests pass without any credentials.
 
 ## License
 
 MIT
-
